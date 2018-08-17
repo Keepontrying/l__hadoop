@@ -29,15 +29,16 @@ public class HighConcurrenceController {
 
     @RequestMapping("/submit")
     @ResponseBody
-    public void submitOrder(@RequestParam Order order, HttpServletRequest request, HttpServletResponse response) {
+    public String submitOrder(Order order, HttpServletRequest request, HttpServletResponse response) {
         logger.info("订单参数：" + order.toString());
 
         try {
-            response.getWriter().write(highConcurrenceService.submitOrder(order));
-        } catch (IOException e) {
+            response.setHeader("Content-Type"," text/html; charset=utf-8");
+            return highConcurrenceService.submitOrder(order)+"";
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
+        return "";
     }
 
 }

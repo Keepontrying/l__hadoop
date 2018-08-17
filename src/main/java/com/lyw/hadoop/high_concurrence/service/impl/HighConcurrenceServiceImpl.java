@@ -36,7 +36,7 @@ public class HighConcurrenceServiceImpl implements HighConcurrenceService{
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        return 0;
+        return 111111110;
     }
 
 
