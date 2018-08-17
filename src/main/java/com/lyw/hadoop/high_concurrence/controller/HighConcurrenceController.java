@@ -30,7 +30,7 @@ public class HighConcurrenceController {
     @RequestMapping("/submit")
     @ResponseBody
     public String submitOrder(Order order, HttpServletRequest request, HttpServletResponse response) {
-        logger.info("订单参数：" + order.toString());
+//        logger.info("订单参数：" + order.toString());
 
         try {
             response.setHeader("Content-Type"," text/html; charset=utf-8");

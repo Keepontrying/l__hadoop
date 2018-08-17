@@ -17,6 +17,6 @@ public class OrderThread extends Thread {
     }
 
     public void run(){
-        System.err.println("订单参数"+order.toString());
+        System.err.println(Thread.currentThread().getName()+"订单参数:"+order.getOrderId());
     }
 }

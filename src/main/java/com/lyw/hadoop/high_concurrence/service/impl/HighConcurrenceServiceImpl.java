@@ -28,15 +28,15 @@ public class HighConcurrenceServiceImpl implements HighConcurrenceService{
     @Override
     public int submitOrder(Order order) {
         Thread thread = new OrderThread(order);
-        Future future = executorService.submit(thread);
         try {
-            logger.error("返回处理结果"+future.get());
+            Future future = executorService.submit(thread);
+            logger.info("返回处理结果"+future.get());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        return 111111110;
+        return order.getOrderId().intValue();
     }
 
 
