@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by wangxiaowu on 2018/8/17.
@@ -23,7 +26,9 @@ import java.io.IOException;
 public class HighConcurrenceController {
 
     static Logger logger = LoggerFactory.getLogger(HighConcurrenceController.class);
-
+    AtomicInteger count = new AtomicInteger(0);
+    final ReentrantLock reentrantLock = new ReentrantLock();
+    HashSet<String> set = new HashSet<>();
     @Autowired
     HighConcurrenceService highConcurrenceService;
 
@@ -39,6 +44,31 @@ public class HighConcurrenceController {
             e.printStackTrace();
         }
         return "";
+    }
+
+    /**
+     * 多线程计数器
+     */
+    @RequestMapping("/online_count")
+    @ResponseBody
+    public void onlineCount(HttpServletRequest request, HttpServletResponse response) {
+//        System.err.println("线程编号："+Thread.currentThread().getId());
+        set.add(Thread.currentThread().getName());
+        logger.info("请求参数："+request.getParameter("id"));
+//        reentrantLock.lock();
+        count.getAndIncrement();
+//        reentrantLock.unlock();
+    }
+
+
+    /**
+     * 获取在线线程数
+     */
+    @RequestMapping("/get_online")
+
+    @ResponseBody
+    public Integer get_online(HttpServletRequest request, HttpServletResponse response) {
+        return count.get();
     }
 
 }
