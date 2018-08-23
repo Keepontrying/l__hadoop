@@ -28,7 +28,7 @@ public class LockThread {
 
         try {
             log.error("锁编号1："+lock.toString());
-//            lock.lock();
+            lock.lock();
             LockSupport.park();
             log.info("锁编号2："+lock.toString());
 //            log.info("进入获取lock的方法,但未执行getLockName方法");
@@ -39,21 +39,29 @@ public class LockThread {
 
         }finally {
 //            log.error("执行getLockName方法，打印name=" + lockName);
-//            lock.unlock();
+            lock.unlock();
         }
 
     }
 
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         ExecutorService executorService = Executors.newFixedThreadPool(5);
         LockThread thread = new LockThread();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 1; i++) {
             final int j = i;
             executorService.submit(()->{
                 thread.getLockName("lyw"+j);
             });
         }
+    }
+
+
+    public static void main(String[] args) {
+        System.err.println("lock之前");
+        LockSupport.park();
+        System.err.println("第一次park已经完成，进行第二次");
+        System.err.println("o");
     }
 
 }

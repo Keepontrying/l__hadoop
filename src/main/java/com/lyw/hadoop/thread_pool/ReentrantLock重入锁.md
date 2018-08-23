@@ -4,6 +4,15 @@
     ![线程池类结构](lock.png)
     
     - ReenTrantLock类解读
+    
+    - 这里我们说下Node。Node结点是对每一个访问同步代码的线程的封装，其包含了需要同步的线程本身以及线程的状态，如是否被阻塞，是否等待唤醒，是否已经被取消等。变量waitStatus则表示当前被封装成Node结点的等待状态，共有4种取值CANCELLED、SIGNAL、CONDITION、PROPAGATE。     
+      - CANCELLED：值为1，在同步队列中等待的线程等待超时或被中断，需要从同步队列中取消该Node的结点，其结点的waitStatus为CANCELLED，即结束状态，进入该状态后的结点将不会再变化。     
+      - SIGNAL：值为-1，被标识为该等待唤醒状态的后继结点，当其前继结点的线程释放了同步锁或被取消，将会通知该后继结点的线程执行。说白了，就是处于唤醒状态，只要前继结点释放锁，就会通知标识为SIGNAL状态的后继结点的线程执行。      
+      - CONDITION：值为-2，与Condition相关，该标识的结点处于等待队列中，结点的线程等待在Condition上，当其他线程调用了Condition的signal()方法后，CONDITION状态的结点将从等待队列转移到同步队列中，等待获取同步锁。     
+      - PROPAGATE：值为-3，与共享模式相关，在共享模式中，该状态标识结点的线程处于可运行状态。      
+      - 0状态：值为0，代表初始化状态。
+      - AQS在判断状态时，通过用waitStatus>0表示取消状态，而waitStatus<0表示有效状态。
+      
     - lock()方法，默认调用非公平锁NonFairSync.lock()方法，compareAndSetState(0,1)调动底层unsafe.compareAndSwapInt(this, stateOffset, expect, update)
         如果stateOffeset和expect相等，就修改stateOffset的值为update,并返回true，否者什么都不做返回false。
         - a.如果返回true:（即state=1 被锁住了），设置当前线程为reentrantLock的排外线程exclusiveOwnerThread
@@ -40,26 +49,31 @@
                     acquireQueued方法：？？尝试阻断线程
              ```
                     final boolean acquireQueued(final Node node, int arg) {
-                            boolean failed = true;
-                            try {
-                                boolean interrupted = false;
-                                for (;;) {
-                                    final Node p = node.predecessor();//head释放锁，该线程才有可能得到锁
-                                    if (p == head && tryAcquire(arg)) {//如果获取锁了，就不阻塞线程
-                                        setHead(node);
-                                        p.next = null; // help GC
-                                        failed = false;
-                                        return interrupted;
-                                    }
-                                    if (shouldParkAfterFailedAcquire(p, node) //见下面method1
-                                        && parkAndCheckInterrupt())//见下面method2
-                                        interrupted = true;//阻断当前线程
+                        boolean failed = true;//标记是否成功拿到资源
+                        try {
+                            boolean interrupted = false;//标记等待过程中是否被中断过
+                            
+                            //又是一个“自旋”！
+                            for (;;) {
+                                final Node p = node.predecessor();//拿到前驱
+                                //如果前驱是head，即该结点已成老二，那么便有资格去尝试获取资源（可能是老大释放完资源唤醒自己的，当然也可能被interrupt了）。
+                                if (p == head && tryAcquire(arg)) {
+                                    setHead(node);//拿到资源后，将head指向该结点。所以head所指的标杆结点，就是当前获取到资源的那个结点或null。
+                                    p.next = null; // setHead中node.prev已置为null，此处再将head.next置为null，就是为了方便GC回收以前的head结点。也就意味着之前拿完资源的结点出队了！
+                                    failed = false;
+                                    return interrupted;//返回等待过程中是否被中断过
                                 }
-                            } finally {
-                                if (failed)
-                                    cancelAcquire(node);
+                                
+                                //如果自己可以休息了，就进入waiting状态，直到被unpark()
+                                if (shouldParkAfterFailedAcquire(p, node) &&
+                                    parkAndCheckInterrupt())
+                                    interrupted = true;//如果等待过程中被中断过，哪怕只有那么一次，就将interrupted标记为true
                             }
+                        } finally {
+                            if (failed)
+                                cancelAcquire(node);
                         }
+                    }
              ```
              ```
                 #### method1
@@ -73,28 +87,21 @@
                      * @return {@code true} if thread should block
                      */
                     private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
-                        int ws = pred.waitStatus;
+                        int ws = pred.waitStatus;//拿到前驱的状态
                         if (ws == Node.SIGNAL)
-                            /*
-                             * This node has already set status asking a release
-                             * to signal it, so it can safely park.
-                             */
+                            //如果已经告诉前驱拿完号后通知自己一下，那就可以安心休息了
                             return true;
                         if (ws > 0) {
                             /*
-                             * Predecessor was cancelled. Skip over predecessors and
-                             * indicate retry.
+                             * 如果前驱放弃了，那就一直往前找，直到找到最近一个正常等待的状态，并排在它的后边。
+                             * 注意：那些放弃的结点，由于被自己“加塞”到它们前边，它们相当于形成一个无引用链，稍后就会被保安大叔赶走了(GC回收)！
                              */
                             do {
                                 node.prev = pred = pred.prev;
                             } while (pred.waitStatus > 0);
                             pred.next = node;
                         } else {
-                            /*
-                             * waitStatus must be 0 or PROPAGATE.  Indicate that we
-                             * need a signal, but don't park yet.  Caller will need to
-                             * retry to make sure it cannot acquire before parking.
-                             */
+                             //如果前驱正常，那就把前驱的状态设置成SIGNAL，告诉它拿完号后通知自己一下。有可能失败，人家说不定刚刚释放完呢！
                             compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
                         }
                         return false;
@@ -107,8 +114,8 @@
                      * @return {@code true} if interrupted
                      */
                     private final boolean parkAndCheckInterrupt() {
-                        LockSupport.park(this);
-                        return Thread.interrupted();
+                        LockSupport.park(this);//调用park()使线程进入waiting状态
+                        return Thread.interrupted();//如果被唤醒，查看自己是不是被中断的。
                     }
              ```
     - unlock()方法 -> sync.release(1);
