@@ -44,7 +44,24 @@ public class LockThread {
         }finally {
 
         }
+    }
 
+    //ReentrantLock方式
+    void shareCount(String var1){
+        log.info("未lock之前："+count);
+        lock.lock();
+        int a = count;
+        log.info("锁住后，未操作："+a);
+        if ("lyw50".equals(var1)) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        count = a + 1;
+        log.info("操作之后count="+count);
+        lock.unlock();
     }
 
 
@@ -54,7 +71,7 @@ public class LockThread {
         for (int i = 0; i < 500; i++) {
             final int j = i;
             Thread runnable = new Thread(()->{
-                thread.getLockName("lyw"+j);
+                thread.shareCount("lyw"+j);
             });
             runnable.start();
 //            executorService.submit(runnable);
