@@ -46,7 +46,7 @@ public class LockThread {
         }
     }
 
-    //ReentrantLock方式
+    //ReentrantLock方式   问题：如果当前调用了lock方法，未调用unlock方法，其他线程无法后去lock,怎么解决当前线程unlock
     void shareCount(String var1){
         log.info("未lock之前："+count);
         lock.lock();
@@ -64,6 +64,56 @@ public class LockThread {
         lock.unlock();
     }
 
+    //LockSupport方式
+    void lockSupport(String var1) {//不适用线程同步，适用线程阻塞
+        LockSupport.park();//阻塞当前线程
+        int a = count;
+        log.info("锁住后，未操作："+a);
+        if ("lyw50".equals(var1)) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        count = a + 1;
+        log.info("操作之后count="+count);
+
+    }
+
+    //synchronized锁方法 方式
+    synchronized void synchronizedLock(String var1) {
+        int a = count;
+        log.info("锁住后，未操作："+a);
+        if ("lyw50".equals(var1)) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        count = a + 1;
+        log.info("操作之后count="+count);
+    }
+
+    //synchronized锁对象 方式
+     void synchronizedBlockLock(String var1) {
+         System.err.println("进入对象，未获取monitor等待中....");
+         synchronized (LockThread.class) {//如果是类型类的话LockThread.class，不同的对象也会锁住    如果是this,相同的对象话，会锁住，不同对象锁不住
+             int a = count;
+             log.info("锁住后，未操作："+a);
+             if ("lyw50".equals(var1)) {
+                 try {
+                     Thread.sleep(1000);
+                 } catch (InterruptedException e) {
+                     e.printStackTrace();
+                 }
+             }
+             count = a + 1;
+             log.info("操作之后count="+count);
+         }
+    }
+
 
     public static void main(String[] args) {
         ExecutorService executorService = Executors.newFixedThreadPool(5);
@@ -71,12 +121,13 @@ public class LockThread {
         for (int i = 0; i < 500; i++) {
             final int j = i;
             Thread runnable = new Thread(()->{
-                thread.shareCount("lyw"+j);
+                thread.synchronizedBlockLock("lyw"+j);
             });
             runnable.start();
 //            executorService.submit(runnable);
 //            LockSupport.unpark(runnable);
 //            runnable.interrupt();
+            LockSupport.unpark(runnable);
 
 //            System.err.println(runnable.getName()+"  不阻断主线程:"+runnable.isAlive());
         }
