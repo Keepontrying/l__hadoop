@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,6 +24,7 @@ public class CollectionTest {
 
     static ConcurrentHashMap<String,Integer> concurrentHashMap = new ConcurrentHashMap();
     Map<String, Object> hashMap = new HashMap<>();
+    Set<Integer> set = new HashSet<>();
 
 
     public void threadSafe(Integer var) {
