@@ -66,7 +66,7 @@
                                 
                                 //如果自己可以休息了，就进入waiting状态，直到被unpark()
                                 if (shouldParkAfterFailedAcquire(p, node) &&
-                                    parkAndCheckInterrupt())
+                                    parkAndCheckInterrupt())//会阻塞当前线程，等待线程被唤醒
                                     interrupted = true;//如果等待过程中被中断过，哪怕只有那么一次，就将interrupted标记为true
                             }
                         } finally {

@@ -22,7 +22,7 @@
         - 泛型类运行原理：编译器强制校验类型，编译为class文件的时候，会擦出类型，替换为Object
         并强制转换类型。所以运行时，并不知道泛型类的实际类型参数。
         - 方法返回类型前加<T> 表示该方法是接受的参数是泛型，而不是类传入的类型参数。
-        - FunctionalInterface：函数接口。只有一个抽象方法。（继承Object公开的方法【native实现】，后者default方法都是有默认实现的，不算抽象方法）
+        - FunctionalInterface：函数接口。只有一个抽象方法。（继承Object公开的方法【native实现】，或者default方法都是有默认实现的，不算抽象方法）
         
     - HashMap动态扩展数组长度 ：判断数组和原始数组容量大小，threshold << 1 计算新的数组容量newThr并创建new Node[newThr]   
   - ConcurrentHashMap :   线程安全的HashMap。通过同步代码块 put，remove操作保证线程安全。
