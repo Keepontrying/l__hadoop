@@ -24,7 +24,7 @@
         - 方法返回类型前加<T> 表示该方法是接受的参数是泛型，而不是类传入的类型参数。
         - FunctionalInterface：函数接口。只有一个抽象方法。（继承Object公开的方法【native实现】，或者default方法都是有默认实现的，不算抽象方法）
         
-    - HashMap动态扩展数组长度 ：判断数组和原始数组容量大小，threshold << 1 计算新的数组容量newThr并创建new Node[newThr]   
+    - HashMap动态扩展数组长度 ：判断数组和原始数组容量大小，(临界值)threshold << 1 计算新的数组容量newThr并创建new Node[newThr]   
   - ConcurrentHashMap :   线程安全的HashMap。通过同步代码块 put，remove操作保证线程安全。
   - LinkedHashMap : 有插入顺序的HashMap。将书友Entity节点链入一个双向链表的HashMap。
         增加了head、tail Entity节点。

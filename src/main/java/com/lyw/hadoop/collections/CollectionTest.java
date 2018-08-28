@@ -23,13 +23,39 @@ public class CollectionTest {
     static final Logger log = LoggerFactory.getLogger(CollectionTest.class);
 
     static ConcurrentHashMap<String,Integer> concurrentHashMap = new ConcurrentHashMap();
-    Map<String, Object> hashMap = new HashMap<>();
+    static Map<String, Object> hashMap = new HashMap<>();
     Map<String, Object> hashMap2 = new TreeMap<>();
     static Set<Integer> set = new HashSet<>();
     static Map<String,Object> map = new LinkedHashMap();
 
+    Hashtable hashtable = new Hashtable();
 
-    public void threadSafe(Integer var) {
+    /**
+     * 测试collections同步集合的静态方法
+     * @param var
+     */
+   public void collectionsSync(){
+       hashMap = Collections.synchronizedMap(hashMap);
+
+   }
+
+    public static void main(String[] args) {
+
+        for (int i = 0; i < 500; i++) {
+//            hashMap.put("lyw" + i, i);
+        }
+
+        for (int i = 0; i < 500; i++) {
+            final int j =i;
+            new Thread(() -> {
+                log.info("多线程操作hashmap");
+                hashMap.put("lyw", j);
+//                hashMap.remove("lyw" + j);
+            }).start();
+        }
+    }
+
+   public void threadSafe(Integer var) {
         concurrentHashMap.put("id", concurrentHashMap.get("id")!=null?concurrentHashMap.get("id")+var:var);
         for (Map.Entry s : map.entrySet()) {
 
@@ -68,11 +94,4 @@ public class CollectionTest {
             concurrentHashMap.get("id");
         }).start();
     }
-
-
-    public static void main(String[] args) {
-        set.add(null);
-        err.println("set-"+set.toArray().toString());
-    }
-
 }

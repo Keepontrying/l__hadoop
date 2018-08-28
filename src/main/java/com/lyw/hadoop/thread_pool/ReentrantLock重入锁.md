@@ -12,7 +12,11 @@
       - PROPAGATE：值为-3，与共享模式相关，在共享模式中，该状态标识结点的线程处于可运行状态。      
       - 0状态：值为0，代表初始化状态。
       - AQS在判断状态时，通过用waitStatus>0表示取消状态，而waitStatus<0表示有效状态。
-      
+    - newCondition() 返回Lock不同用途的Condition实例
+       - Condition替代Object监视器方法（wait\notify\notifyAll\）分解为不同的对象，与Lock组合使用
+       ```
+           eg: 
+       ```
     - lock()方法，默认调用非公平锁NonFairSync.lock()方法，compareAndSetState(0,1)调动底层unsafe.compareAndSwapInt(this, stateOffset, expect, update)
         如果stateOffeset和expect相等，就修改stateOffset的值为update,并返回true，否者什么都不做返回false。
         - a.如果返回true:（即state=1 被锁住了），设置当前线程为reentrantLock的排外线程exclusiveOwnerThread
