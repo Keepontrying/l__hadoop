@@ -3,10 +3,16 @@ package com.lyw.hadoop.cglib_learn;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import sun.management.ManagementFactoryHelper;
+import sun.management.MemoryUsageCompositeData;
+import sun.management.StackTraceElementCompositeData;
 
+import javax.management.openmbean.CompositeData;
+import java.lang.management.MemoryPoolMXBean;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 /**
  * 类描述：cglib代理
@@ -57,8 +63,32 @@ public class CglibProxy implements MethodInterceptor,InvocationHandler{
         return rs;
     }
 
+    //代理 MemoryPoolImpl
+    public void getMBeans() {
+        List<MemoryPoolMXBean> helper = ManagementFactoryHelper.getMemoryPoolMXBeans();
+        /*Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(MemoryUsageCompositeData.class);
+        enhancer.setCallback(new CglibProxy());
+        CompositeData compositeData = (CompositeData) enhancer.create();*/
+        helper.forEach(h ->{
+            System.err.println(""+h.getObjectName());
+            CompositeData memory = MemoryUsageCompositeData.toCompositeData(h.getUsage());
+//            CompositeData memory = StackTraceElementCompositeData.toCompositeData(
+//                    StackTraceElementCompositeData.from(memory1));
 
-    public static void main2(String[] args) {
+            memory.values().forEach(x ->{
+                System.err.println("@@@"+x);
+            });
+        });
+    }
+
+    public static void main(String[] args) {
+        CglibProxy cglibProxy = new CglibProxy();
+        cglibProxy.getMBeans();
+    }
+
+
+   public static void main2(String[] args) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(MyThread.class);
         enhancer.setCallback(new CglibProxy());
@@ -66,7 +96,7 @@ public class CglibProxy implements MethodInterceptor,InvocationHandler{
         myThread.start();
     }
 
-    public static void main(String[] args) {
+    public static void main3(String[] args) {
         JDKProxyImpl jdkProxy = new JDKProxyImpl();
         JDKProxy jdkProxy1 = (JDKProxy) Proxy.newProxyInstance(jdkProxy.getClass().getClassLoader(),
                                                                 jdkProxy.getClass().getInterfaces(),

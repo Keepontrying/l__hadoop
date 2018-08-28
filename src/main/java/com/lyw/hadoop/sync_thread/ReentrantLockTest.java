@@ -1,5 +1,7 @@
 package com.lyw.hadoop.sync_thread;
 
+import javax.management.openmbean.CompositeDataSupport;
+import java.lang.management.MemoryPoolMXBean;
 import java.util.Collection;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,7 +21,7 @@ public class ReentrantLockTest {
     int putptr,takeptr;
     volatile int count;
 
-    public void put(Object x) {
+   public void put(Object x) {
         try {
             lock.lock();
             while (cache.length == count) {
