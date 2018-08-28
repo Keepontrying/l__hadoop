@@ -64,17 +64,19 @@ public class ReentrantLockTest {
 
     public static void main(String[] args) {
         ReentrantLockTest test = new ReentrantLockTest();
+        Thread.currentThread().interrupt();
         new Thread(()->{
+
             for (int i = 0; i < 10; i++) {
                 test.take();
             }
         }).start();
 
-        new Thread(()->{
+        /*new Thread(()->{
             for (int i = 0; i < 10; i++) {
                 test.put(i);
             }
-        }).start();
+        }).start();*/
     }
 
 
