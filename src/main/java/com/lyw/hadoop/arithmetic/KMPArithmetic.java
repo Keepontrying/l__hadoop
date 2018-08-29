@@ -30,14 +30,14 @@ public class KMPArithmetic {
             }
 
             if (count == sub.length) {
-                return next-sub.length;
+                return next-1;
             }
 
         }
     }
 
     public char[] getsubChar(String s,int index) {
-        next = index + sub.length;
+        next = index + 1;
         if (next > s.length()) {
             return null;
         }
