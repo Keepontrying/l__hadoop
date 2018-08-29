@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * 类描述：cglib代理
@@ -82,8 +83,9 @@ public class CglibProxy implements MethodInterceptor,InvocationHandler{
         });
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         CglibProxy cglibProxy = new CglibProxy();
+        LockSupport.park();
         cglibProxy.getMBeans();
     }
 
