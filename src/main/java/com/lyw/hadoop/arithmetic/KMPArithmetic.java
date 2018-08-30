@@ -8,7 +8,7 @@ package com.lyw.hadoop.arithmetic;
  */
 public class KMPArithmetic {
 
-    char[] sub = {'a','b','c','d'};
+    char[] sub = {'s','a','b','c','d'};
 
     int count;
     int next;
