@@ -45,9 +45,51 @@
             5. 方法返回地址：当前栈帧出栈时恢复到上个栈帧调用的位置。
         - native方法栈：与Java虚拟栈基本相同，只不过执行的是native方法。
         
-        
+- class类文件加载（类加载）
+    - 触发类加载的条件：<font color=red>类的直接引用会触发类的初始化操作</font>
+        - 主动引用
+            1. new 对象
+            2. 使用java.lang.reflect反射调用的时候
+            3. 子类初始化时发现父类没有初始化，会触发父类初始化
+            4. 访问类属性（static）会触发类初始化
+            5. 启动main方法的时候，会初始化执行类
+        - 被动引用
+            1. 子类访问父类的静态域，不会触发子类初始化
+            2. 引用常量不会触发类初始化
+            3. ??<font color=green>通过数组定义类的引用，不会触发此类初始化</font>
+    - class文件加载内存过程
+        1. 根据符号引用查找class文件，并将class二进制文件读取到内存
+        2. 检查载入的class文件的正确性，给类的静态变量分配存储空间，将符号引用更新为直接引用
+        3. 初始化：对类的静态变量、静态代码块执行初始化操作
+    - <font color=blue>note:</font>类加载完成后，会在堆内存生成class对象，方法区的metaspace持有
+     class对象指针。
 - java类实例化 
+    - 类实例化
+        1. 类加载：class文件加载
+        2. 实例化对象：根据metaspace持有的class对象指针，在堆内存中创建一个oop对象（普通对象指针）
+           将实例化对象的引用指向oop对象。
+           ```text
+               //hotspot/src/share/vm/oops/oop.hpp
+               class oopDesc {
+               private:
+                 volatile markOop _mark;//存放gc、锁、空间大小，起始位置等
+                 union _metadata {
+                   Klass*      _klass; //类元数据（java.lang.Class）指针
+                   narrowKlass _compressed_klass;
+                 } _metadata;
+               }
+            ```
     - 当执行new实例化对象<font color=red>每个实例对象都有该类Class对象的引用</font>
        1. 去constant pool检查是否有该对象的符号引用。如果没有找到先执行类的加载过程生成class对象
        2. 根据符号引用获取对象类型，父类，接口、方法等信息。然后在堆内存中分配内存，更新符号引用为直接引用
-       
+
+- java类实例化图解
+    ![实例化](java对象实例化.png)
+    - ① 通过符号引用先去方法区常量池检查是否已经加载过类型数据class类。如果是直接引用，就直接访问
+        堆内存中的对象
+    - ② 如果没有class对象，根据类全路径限定名加载class二进制文件到内存metaspace元数据类内存，
+        在退内存中生成对应类的class对象，并将class对象引用返回到常量池中并更新符号引用。
+    - ③ 堆内存中的类型对象class对象支持访问class二进制在方法区的数据。
+    - ④ 然后调用底层c++在堆内存中分配空间，然后根据class对象创建java对象（即oop对象），然后用
+        oop对象引用更新栈帧本地变量中的符号引用
+    - ⑤ 栈帧中的引用直接访问堆内存中的实例对象数据
