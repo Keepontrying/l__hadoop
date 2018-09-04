@@ -155,4 +155,13 @@
       GET /customer/_search?q=*&sort=age:asc&pretty
       
       // q=* customer index里面所有的documents
+      // sort=age:asc  以字段age升序排序
+    ```
+    - <font color=blue>rest 请求主体(效果等同上面)</font>
+    ```html
+      GET /customer/_search
+      {
+          "query" :{"match_all":{}}
+          "sort" :[{"age":"asc"}]
+      }
     ```
