@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 import static java.lang.System.*;
 
@@ -44,7 +45,6 @@ public class CollectionTest {
         for (int i = 0; i < 500; i++) {
 //            hashMap.put("lyw" + i, i);
         }
-
         for (int i = 0; i < 500; i++) {
             final int j =i;
             new Thread(() -> {

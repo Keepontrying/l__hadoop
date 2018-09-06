@@ -1,7 +1,6 @@
 package com.lyw.hadoop.java_gc;
 
 import com.lyw.hadoop.sync_thread.ReentrantLockTest;
-import org.openjdk.jol.info.ClassLayout;
 
 /**
  * Created by wangxiaowu on 2018/8/29.
@@ -15,11 +14,11 @@ public class ReferenceTest {
 
 
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        String s = ClassLayout.parseClass(ReentrantLockTest.class).toPrintable();
+//        String s = ClassLayout.parseClass(ReentrantLockTest.class).toPrintable();
         Class klass =ClassLoader.getSystemClassLoader().loadClass("com.lyw.hadoop.sync_thread.ReentrantLockTest");
         Object o =klass.newInstance();
-        String ins = ClassLayout.parseInstance(o).toPrintable();
-        System.err.println(s);
-        System.err.println(ins);
+//        String ins = ClassLayout.parseInstance(o).toPrintable();
+//        System.err.println(s);
+//        System.err.println(ins);
     }
 }
