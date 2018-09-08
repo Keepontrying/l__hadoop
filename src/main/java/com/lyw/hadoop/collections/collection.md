@@ -29,3 +29,5 @@
   - LinkedHashMap : 有插入顺序的HashMap。将书友Entity节点链入一个双向链表的HashMap。
         增加了head、tail Entity节点。
   - TreeMap :红黑树实现的有序HashMap。
+  
+  
