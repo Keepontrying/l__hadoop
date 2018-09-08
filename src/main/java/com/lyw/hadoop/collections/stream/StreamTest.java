@@ -19,10 +19,11 @@ import java.util.Random;
 public class StreamTest {
 
     public static List<Node> packageList(){
-        List<Node> list = new ArrayList<>();
+        List<Node> list = new ArrayList<>(10);
+
         list.forEach(x -> {
             x.setNodeId(RandomUtils.nextInt(100));
-            x.setNodeName(RandomStringUtils.random(5, "梁玉武中国人名首富测试数据"));
+            x.setNodeName(RandomStringUtils.random(5, "lywceshi测试数据"));
             x.setNodeMessage(RandomStringUtils.random(20));
         });
         return list;
@@ -30,7 +31,7 @@ public class StreamTest {
 
     public static void main(String[] args) {
         List<Node> list = packageList();
-        Node node = list.stream().max((x,y) -> x.getNodeId() - y.getNodeId()).get();
+        Node node = list.stream().max((x,y) -> x.getNodeId().compareTo(y.getNodeId())).get();
         System.err.println("最大的node="+ JSON.toString(node));
     }
 
