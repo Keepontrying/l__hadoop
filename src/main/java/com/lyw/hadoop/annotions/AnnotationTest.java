@@ -10,8 +10,10 @@ import java.lang.annotation.*;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 public @interface AnnotationTest {
 
+    public String name() default "test" ;
 
+    public int id() default -1;
 }
