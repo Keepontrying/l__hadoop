@@ -1,8 +1,12 @@
 package com.lyw.hadoop.sync_thread;
 
+import com.alibaba.fastjson.JSON;
+
 import javax.management.openmbean.CompositeDataSupport;
 import java.lang.management.MemoryPoolMXBean;
 import java.util.Collection;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -66,11 +70,15 @@ public class ReentrantLockTest {
 
     public static void main(String[] args) {
         ReentrantLockTest test = new ReentrantLockTest();
-        Thread.currentThread().interrupt();
+        LinkedBlockingQueue<String> queue = new LinkedBlockingQueue();
+//        Thread.currentThread().interrupt();
         new Thread(()->{
 
-            for (int i = 0; i < 10; i++) {
-                test.take();
+            try {
+                Thread.sleep(10000);
+                queue.put("sf");
+            } catch (InterruptedException e) {
+
             }
         }).start();
 
@@ -79,6 +87,21 @@ public class ReentrantLockTest {
                 test.put(i);
             }
         }).start();*/
+
+
+        /*for (int i = 0; i < 5; i++) {
+            try {
+                queue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.err.println("继续执行，不住赛"+i);
+        }*/
+
+        ConcurrentLinkedQueue<String> con = new ConcurrentLinkedQueue<>();
+        con.offer("test");
+        System.err.println("@@@"+ JSON.toJSONString(con));
+        con.offer("helo");
     }
 
 
@@ -101,6 +124,25 @@ public class ReentrantLockTest {
         }
 
     }
+
+
+    /**
+     *
+     * UNSAFE_ENTRY(jboolean, Unsafe_CompareAndSwapObject(JNIEnv *env, jobject unsafe, jobject obj, jlong offset, jobject e_h, jobject x_h))
+
+     UnsafeWrapper("Unsafe_CompareAndSwapObject");
+     oop x = JNIHandles::resolve(x_h);
+     oop e = JNIHandles::resolve(e_h);
+     oop p = JNIHandles::resolve(obj);
+     HeapWord* addr = (HeapWord *)index_oop_from_field_offset_long(p, offset);
+     oop res = oopDesc::atomic_compare_exchange_oop(x, addr, e, true);
+     jboolean success  = (res == e);
+     if (success)
+     update_barrier_set((void*)addr, x);
+     return success;
+     UNSAFE_END
+
+     */
 
 
 }
