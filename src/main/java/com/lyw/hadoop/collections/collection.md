@@ -8,11 +8,113 @@
             }
         ```
       - LinkedHashSet
-        
+        底层调用的是LinkedHashMap
+        ```html
+           HashSet(int initialCapacity, float loadFactor, boolean dummy) {
+                   map = new LinkedHashMap<>(initialCapacity, loadFactor);
+               }
+        ```
       - EnumSet
 
-
-
+  - Queue
+      - BlockingQueue阻塞队列:实现类LinkedBlockingQueue，通过重入锁
+      Condition  await实现线程挂起，队列阻塞。插入元素时唤醒 Condition signal
+      唤醒线程。
+      ```
+        // 阻塞获取元素
+        public E take() throws InterruptedException {
+            E x;
+            int c = -1;
+            final AtomicInteger count = this.count;
+            final ReentrantLock takeLock = this.takeLock;
+            takeLock.lockInterruptibly();
+            try {
+                while (count.get() == 0) {
+                    //队列为空时，挂起线程，阻塞获取元素
+                    notEmpty.await();//LockSupport.park(currentThread)
+                }
+                x = dequeue();//删除队列的表头元素，并返回该元素
+                c = count.getAndDecrement();//现获取元素个数返回，然后-1
+                if (c > 1)
+                    notEmpty.signal();
+            } finally {
+                takeLock.unlock();
+            }
+            if (c == capacity)//删除了一个元素，可以放入元素
+                signalNotFull();//唤醒插入元素线程
+            return x;
+        }
+   
+        public boolean offer(E e) {
+            if (e == null) throw new NullPointerException();
+            final AtomicInteger count = this.count;
+            if (count.get() == capacity)
+                return false;
+            int c = -1;
+            Node<E> node = new Node<E>(e);
+            final ReentrantLock putLock = this.putLock;
+            putLock.lock();
+            try {
+                if (count.get() < capacity) {
+                    enqueue(node);
+                    c = count.getAndIncrement();
+                    if (c + 1 < capacity)
+                        notFull.signal();
+                }
+            } finally {
+                putLock.unlock();
+            }
+            if (c == 0)
+                signalNotEmpty();
+            return c >= 0;
+        }
+   
+        private void signalNotEmpty() {
+           final ReentrantLock takeLock = this.takeLock;
+           takeLock.lock();
+           try {
+               notEmpty.signal();//底层将线程的等待状态修改为唤醒状态
+           } finally {
+               takeLock.unlock();
+           }
+       }
+     ```
+      - ConcurrentLinkedQueue 非阻塞队列。通过CAS（Unsafe类）和算法优化。实现非阻塞
+       队列操作。CAS线程安全的操作。算法优化，是哨兵节点控制循环操作出口。<br/>
+       <font color='red'>？？第一次操作时：为什么会调用Collection的isEmpty()方法
+       更新head节点，到底怎样实现调用的？</font></br>
+       ```html
+            public boolean offer(E e) {
+                checkNotNull(e);
+                final Node<E> newNode = new Node<E>(e);
+        
+                for (Node<E> t = tail, p = t;;) {
+                    Node<E> q = p.next;
+                    if (q == null) {
+                        // p is last node
+                        if (p.casNext(null, newNode)) {
+                            // Successful CAS is the linearization point
+                            // for e to become an element of this queue,
+                            // and for newNode to become "live".
+                            if (p != t) // hop two nodes at a time
+                                casTail(t, newNode);  // Failure is OK.
+                            return true;
+                        }
+                        // Lost CAS race to another thread; re-read next
+                    }
+                    else if (p == q)
+                        // We have fallen off list.  If tail is unchanged, it
+                        // will also be off-list, in which case we need to
+                        // jump to head, from which all live nodes are always
+                        // reachable.  Else the new tail is a better bet.
+                        p = (t != (t = tail)) ? t : head;
+                    else
+                        // Check for tail updates after two hops.
+                        p = (p != t && t != (t = tail)) ? t : q;
+                }
+            }
+       ```
+       ![非阻塞队列](Con_LinkedQueue.png)
 ## Map是键值对集合
 ![Map类图](map类图.png)
   - HashMap:单向链表数组实现的key不重复的键值对集合。key哈希值是数组索引，然后单向链表存储对象。
@@ -26,8 +128,21 @@
         
     - HashMap动态扩展数组长度 ：判断数组和原始数组容量大小，(临界值)threshold << 1 计算新的数组容量newThr并创建new Node[newThr]   
   - ConcurrentHashMap :   线程安全的HashMap。通过同步代码块 put，remove操作保证线程安全。
-  - LinkedHashMap : 有插入顺序的HashMap。将书友Entity节点链入一个双向链表的HashMap。
+  - LinkedHashMap : 有插入顺序的HashMap。将输入Entity节点链入一个双向链表的HashMap。
         增加了head、tail Entity节点。
+    ```
+        //重写了newNode方法，调用下面方法够着双向链表
+        private void linkNodeLast(LinkedHashMap.Entry<K,V> p) {
+                LinkedHashMap.Entry<K,V> last = tail;
+                tail = p;
+                if (last == null)
+                    head = p;
+                else {
+                    p.before = last;
+                    last.after = p;
+                }
+            }
+    ```
   - TreeMap :红黑树实现的有序HashMap。
   
   

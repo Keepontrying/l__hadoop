@@ -1,5 +1,7 @@
 package com.lyw.hadoop.java_gc;
 
+import com.lyw.hadoop.collections.LinkedQueueTest;
+import com.lyw.hadoop.collections.QueueTest;
 import com.lyw.hadoop.sync_thread.ReentrantLockTest;
 
 /**
@@ -13,12 +15,19 @@ public class ReferenceTest {
 
 
 
-    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public static void main(String[] args) throws Exception, IllegalAccessException, InstantiationException {
 //        String s = ClassLayout.parseClass(ReentrantLockTest.class).toPrintable();
-        Class klass =ClassLoader.getSystemClassLoader().loadClass("com.lyw.hadoop.sync_thread.ReentrantLockTest");
-        Object o =klass.newInstance();
+//        Class klass =ClassLoader.getSystemClassLoader().loadClass("com.lyw.hadoop.sync_thread.ReentrantLockTest");
+//        Object o =klass.newInstance();
 //        String ins = ClassLayout.parseInstance(o).toPrintable();
 //        System.err.println(s);
 //        System.err.println(ins);
+
+        LinkedQueueTest<String> queueTest = new LinkedQueueTest<>();
+//        queueTest.offer("test");
+        queueTest.offer("t");
+        queueTest.offer("c");
+        queueTest.offer("cc");
+        queueTest.peek();
     }
 }
