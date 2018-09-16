@@ -27,7 +27,7 @@
               }
         ```
         
-        - 条件一：调用NonFairSync.tryAcquire(1)->Sync.nonfairTryAcquire 尝试获取锁
+        - 条件一：调用NonFairSync.tryAcquire(1)->Sync.nonfairTryAcquire 尝试获取锁 state状态和exclusiveOwnerThread排他线程
              ```
                   final boolean nonfairTryAcquire(int acquires) { 
                       final Thread current = Thread.currentThread(); 
@@ -49,8 +49,16 @@
                   }
              ```
         - 条件二：acquireQueued(addWaiter(Node.EXCLUSIVE), arg)  
-                    addWaiter(Node.EXCLUSIVE)将当前线程包装为exclusive node，插入到双向队列中（双向链表方式实现）
-                    acquireQueued方法：？？尝试阻断线程
+                    addWaiter(Node.EXCLUSIVE)将当前线程包装为nextWaiter是null的node，插入到双向队列中（双向链表方式实现）
+                    并且该node的waitestatus=0</br>
+                    acquireQueued方法：for循环有2中结果
+                        a. 找到该节点的前驱，如果是head的话，该节点尝试后去锁资源 state=0并且修改state=1持有锁，修改head为当前弄得。获取锁就继续执行</br>
+                        b. 如果node节点前驱不是head,或者没有获取锁资源，判断node节点前驱prev节点的waiteStatus状态，
+                            waiteStatus = Node.SIGNAL(-1)返回true并挂起当前线程，等待signal或者interrupt</br>
+                            waiteStatus > 0 (及该前驱节点取消)，while循环过滤掉取消的节点，重新连接链表</br>
+                            其他的情况都将前驱prev节点的waiteStatus修改为signal</br>
+                        c. 自旋直到前驱prev节点为signal,返会true,挂起当前线程等待唤醒，或者阻断
+                            
              ```
                     final boolean acquireQueued(final Node node, int arg) {
                         boolean failed = true;//标记是否成功拿到资源
@@ -59,7 +67,7 @@
                             
                             //又是一个“自旋”！
                             for (;;) {
-                                final Node p = node.predecessor();//拿到前驱
+                                final Node p = node.predecessor();//找到node节点的prev节点
                                 //如果前驱是head，即该结点已成老二，那么便有资格去尝试获取资源（可能是老大释放完资源唤醒自己的，当然也可能被interrupt了）。
                                 if (p == head && tryAcquire(arg)) {
                                     setHead(node);//拿到资源后，将head指向该结点。所以head所指的标杆结点，就是当前获取到资源的那个结点或null。
@@ -82,13 +90,9 @@
              ```
                 #### method1
                 /**
-                     * Checks and updates status for a node that failed to acquire.
-                     * Returns true if thread should block. This is the main signal
-                     * control in all acquire loops.  Requires that pred == node.prev.
-                     *
-                     * @param pred node's predecessor holding status
-                     * @param node the node
-                     * @return {@code true} if thread should block
+                     *1. 修改前驱节点waitStatus = Node.SIGNAL,挂起当前线程
+                     2. 过滤node节点前所有已经取消的prev节点，重新连接链表。
+                     主要作用是修改前驱节点prev的waitStatus = Node.SIGNAL=-1,挂起当前节点的线程
                      */
                     private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
                         int ws = pred.waitStatus;//拿到前驱的状态
@@ -125,7 +129,7 @@
     - unlock()方法 -> sync.release(1);
     ```
         public final boolean release(int arg) {
-                if (tryRelease(arg)) {//尝试释放锁
+                if (tryRelease(arg)) {//尝试释放锁，只是修改了锁的state和排外线程
                     Node h = head;
                     if (h != null && h.waitStatus != 0)
                         unparkSuccessor(h);
@@ -150,9 +154,7 @@
     ```
     ```
         /**
-             * Wakes up node's successor, if one exists.
-             *
-             * @param node the node
+             * 真正的释放锁
              */
             private void unparkSuccessor(Node node) {
                 /*
@@ -161,7 +163,7 @@
                  * fails or if status is changed by waiting thread.
                  */
                 int ws = node.waitStatus;
-                if (ws < 0)
+                if (ws < 0)//需改head节点的状态为0，
                     compareAndSetWaitStatus(node, ws, 0);
         
                 /*
@@ -173,11 +175,11 @@
                 Node s = node.next;
                 if (s == null || s.waitStatus > 0) {
                     s = null;
-                    for (Node t = tail; t != null && t != node; t = t.prev)
+                    for (Node t = tail; t != null && t != node; t = t.prev)//通过tail节点选好查找前驱节点，直到最前一面的一个前驱prev节点，然后唤醒线程
                         if (t.waitStatus <= 0)
                             s = t;
                 }
                 if (s != null)
-                    LockSupport.unpark(s.thread);
+                    LockSupport.unpark(s.thread);//释放next节点的锁，然后next节点开始从LockSupport.park()指令出开始执行程序（即释放锁）
             }
     ```

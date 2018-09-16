@@ -1,8 +1,6 @@
 package com.lyw.hadoop.java_gc;
 
 import com.lyw.hadoop.collections.LinkedQueueTest;
-import com.lyw.hadoop.collections.QueueTest;
-import com.lyw.hadoop.sync_thread.ReentrantLockTest;
 
 /**
  * Created by wangxiaowu on 2018/8/29.

@@ -69,9 +69,9 @@ public class ReentrantLockTest {
 
 
     public static void main(String[] args) {
-        ReentrantLockTest test = new ReentrantLockTest();
+        /*ReentrantLockTest test = new ReentrantLockTest();
         LinkedBlockingQueue<String> queue = new LinkedBlockingQueue();
-//        Thread.currentThread().interrupt();
+        Thread.currentThread().interrupt();
         new Thread(()->{
 
             try {
@@ -80,7 +80,7 @@ public class ReentrantLockTest {
             } catch (InterruptedException e) {
 
             }
-        }).start();
+        }).start();*/
 
         /*new Thread(()->{
             for (int i = 0; i < 10; i++) {
@@ -97,11 +97,7 @@ public class ReentrantLockTest {
             }
             System.err.println("继续执行，不住赛"+i);
         }*/
-
-        ConcurrentLinkedQueue<String> con = new ConcurrentLinkedQueue<>();
-        con.offer("test");
-        System.err.println("@@@"+ JSON.toJSONString(con));
-        con.offer("helo");
+        
     }
 
 
