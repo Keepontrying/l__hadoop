@@ -12,6 +12,7 @@ public class KMPArithmetic {
 
     int count;
     int next;
+    char[] match = new char[sub.length];
 
     public int indexOf(String chars) {
 
