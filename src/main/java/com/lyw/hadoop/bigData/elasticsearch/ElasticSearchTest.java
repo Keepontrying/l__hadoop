@@ -1,3 +1,4 @@
+/*
 package com.lyw.hadoop.bigData.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
@@ -39,12 +40,14 @@ import java.util.stream.Stream;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
+*/
 /**
  * 类描述：
  *
  * @author liangyuwu
  * @Time 2018/9/6 17:29
- */
+ *//*
+
 public class ElasticSearchTest {
 
     static final Logger log = LoggerFactory.getLogger(ElasticSearchTest.class);
@@ -84,11 +87,13 @@ public class ElasticSearchTest {
         return false;
     }
 
-    /**
+    */
+/**
      * 封装index的settings
      * @param indexName
      * @return
-     */
+     *//*
+
     private Settings setIndexProperties(String... indexName) throws Exception{
         Settings.Builder builder = Settings.builder()
                 .put("index.number_of_shards",3)
@@ -97,11 +102,13 @@ public class ElasticSearchTest {
         return null;
     }
 
-    /**
+    */
+/**
      * 校验索引是否存在
      * @param indicesName
      * @return boolean
-     */
+     *//*
+
     public boolean indicesExist(String... indicesName) throws Exception{
         //#method -1
         IndicesExistsRequest existsRequest = new IndicesExistsRequest(indicesName);
@@ -197,7 +204,8 @@ public class ElasticSearchTest {
 
 
     public static void main2(String[] args) throws Exception {
-        /*IndexResponse response = getClient().prepareIndex("customer", "student", "1")
+        */
+/*IndexResponse response = getClient().prepareIndex("customer", "student", "1")
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("name", "liangyuwu")
@@ -226,7 +234,8 @@ public class ElasticSearchTest {
             System.err.println("hit ="+ hitstr);
 
         }
-*/
+*//*
+
         ElasticSearchTest elasticSearchTest = new ElasticSearchTest();
         SearchModel mode = elasticSearchTest.packageData();
         boolean ok = elasticSearchTest.createIndices(mode.getIndexName());
@@ -234,3 +243,4 @@ public class ElasticSearchTest {
 //        elasticSearchTest.queryData(mode);
     }
 }
+*/
