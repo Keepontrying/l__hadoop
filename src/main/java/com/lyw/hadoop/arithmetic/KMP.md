@@ -34,3 +34,19 @@
      - 证明：假设p不存在k满足命题（2），但S中存在K=k'满足 S匹配P，且k'<j</br>
         因为：存在k' =》 S[i-k'+1,i-1] &equiv; P[1,j-k'+1]  等价&rArr;证明  P[1,j-k'+1] &equiv; P[j-k',j-1]</br>
         所以：假设不成立。
+        
+# BM(boyer-moore)高效字符串检索算法
+   - 坏字符原则：从模式串的最后一位开始匹配，主串和模式串不匹配的字符，称主串中的那个字符为 '<font color=green>坏字符</font>',不匹配时该'<font color=green>坏字符</font>'在模式串中的位置位k。
+        1. 当<font color=green>坏字符</font>在模式串中不存在时，<font color=green>坏字符</font>在模式串中的位置位-1，<font color=red>索引从0开始</font></br>
+        <font color=red>模式串向右移动距离公式：右移动距离= '<font color=green>坏字符</font>'不匹配时在模式串中的位置 - '<font color=green>坏字符</font>'出现在模式串最右边的位置</font></br>
+        eg: 主串 S'=ABCSDBAEXO  模式串P'= ABCE
+        ![](boyer-moore_1.png)</br>
+        则 S'<sub>3</sub>=S 和P'<sub>3</sub>=E不匹配，称S是'<font color=green>坏字符</font>',S在模式串P'中不存在，所以最右边位置=-1</br>
+        则：模式串P向右移动具体：l = 3-(-1)=4 => 从S'<sub>4</sub>=D和P'<sub>1</sub>=A对其，从模式串后面开始匹配</br>
+        2. 当'<font color=green>坏字符</font>'在模式串中存在，则'<font color=green>坏字符</font>'出现在模式串最右边的位置位i</br>
+        eg: 主串 S'=ABCSDBAEXO  模式串P'= ABCE
+        ![](boyer-moore_2.png)</br>
+        第二次匹配从S'<sub>7</sub>=E和模式串匹配，然后匹配前一个字符S'<sub>6</sub>=A,发现不匹配是'<font color=green>坏字符</font>'</br>
+        A在模式串k=2，i=0; 所以模式串右移距离l=2-0=2 =>主串S'<sub>6</sub>=A和模式串P'<sub>0</sub>=A对其
+   
+   - 最好后缀原则：
