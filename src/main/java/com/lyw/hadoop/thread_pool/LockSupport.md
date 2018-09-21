@@ -8,7 +8,7 @@
             /**
             *3种情况唤醒该线程
             *1、其他线程调用unpark,传入的线程是当前线程
-            *2、
+            *2、其他线程中interrupt当前线程
             */
             UNSAFE.park(false, 0L);
         }
