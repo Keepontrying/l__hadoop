@@ -1,5 +1,8 @@
 package com.lyw.hadoop.utils;
 
+import org.xhtmlrenderer.context.AWTFontResolver;
+import org.xhtmlrenderer.css.constants.IdentValue;
+import org.xhtmlrenderer.css.value.FontSpecification;
 import org.xhtmlrenderer.swing.Java2DRenderer;
 import org.xhtmlrenderer.util.FSImageWriter;
 
@@ -20,11 +23,17 @@ import static org.xhtmlrenderer.test.DocumentDiffTest.height;
  */
 public class ImageUtil {
 
-    public static void main2(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception{
         String html="/Users/wangxiaowu/Downloads/551385082.html";
         String img="/Users/wangxiaowu/Downloads/551385082.png";
 
         Java2DRenderer renderer = new Java2DRenderer(new File(html),900);
+        AWTFontResolver fontResolver = new AWTFontResolver();
+        String[] s ={"Microsoft Sans Serif","Hiragino Sans"};
+        fontResolver.resolveFont(renderer.getSharedContext(),s,12f, IdentValue.NORMAL,
+                IdentValue.NORMAL,IdentValue.NORMAL);
+        renderer.getSharedContext().setFontResolver(fontResolver);
+
         BufferedImage image = renderer.getImage();
 
         FSImageWriter fsImageWriter = new FSImageWriter();
@@ -34,7 +43,7 @@ public class ImageUtil {
 
     }
 
-    public static void main(String[] args) throws MalformedURLException,
+    public static void main2(String[] args) throws MalformedURLException,
     IOException,URISyntaxException,AWTException {
 
         String html = "/Users/wangxiaowu/Downloads/551385082.html";
