@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 public class PhanttomJS {
 
     static String file_path = "/Users/wangxiaowu/Downloads/551385082.html";
-    static String img_path = "/Users/wangxiaowu/Downloads/551385082.png";;
+    static String img_path = "/Users/wangxiaowu/Downloads/551385082.png";
     private static String BLANK = " ";
 
     static String bin_path = "/Users/wangxiaowu/Desktop/phantomjs-2.1.1-macosx/bin/phantomjs";
@@ -58,6 +58,6 @@ public class PhanttomJS {
 
     public static void main2(String[] args) throws IOException {
         String url = "https://www.baidu.com/";//以百度网站首页为例
-        PhantomTools.printUrlScreen2jpg(url);
+        PhanttomJS.printUrlScreen2jpg(url);
     }
 }

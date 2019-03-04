@@ -1,8 +1,12 @@
+/*
 package com.lyw.hadoop;
 
+*/
 /**
  * Created by wangxiaowu on 2018/9/1.
- */
+ *//*
+
+*/
 /*
  * Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -24,8 +28,10 @@ package com.lyw.hadoop;
  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
  * or visit www.oracle.com if you need additional information or have any
  * questions.
- */
+ *//*
 
+
+*/
 /*
  * @ignore 8028095
  * @test
@@ -36,7 +42,8 @@ package com.lyw.hadoop;
  * @build TestForName
  * @build LoadClassNegative
  * @run main LoadClassNegative
- */
+ *//*
+
 
 import java.io.File;
 import com.lyw.hadoop.oracle.OutputAnalyzer;
@@ -56,3 +63,4 @@ public class LoadClassNegative {
         output.shouldHaveExitValue(0);
     }
 }
+*/
