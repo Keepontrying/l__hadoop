@@ -83,7 +83,7 @@ public class CglibProxy implements MethodInterceptor,InvocationHandler{
         });
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main3(String[] args) throws InterruptedException {
         CglibProxy cglibProxy = new CglibProxy();
         LockSupport.park();
         cglibProxy.getMBeans();
@@ -98,7 +98,7 @@ public class CglibProxy implements MethodInterceptor,InvocationHandler{
         myThread.start();
     }
 
-    public static void main3(String[] args) {
+    public static void main(String[] args) {
         JDKProxyImpl jdkProxy = new JDKProxyImpl();
         JDKProxy jdkProxy1 = (JDKProxy) Proxy.newProxyInstance(jdkProxy.getClass().getClassLoader(),
                                                                 jdkProxy.getClass().getInterfaces(),
