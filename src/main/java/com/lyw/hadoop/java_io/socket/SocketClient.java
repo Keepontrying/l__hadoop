@@ -1,5 +1,7 @@
 package com.lyw.hadoop.java_io.socket;
 
+import com.lyw.hadoop.design.singleton.SingletonEnum;
+
 import java.net.*;
 import java.util.Arrays;
 
@@ -11,7 +13,7 @@ import java.util.Arrays;
  */
 public class SocketClient {
 
-    public static void main(String[] args) throws Exception {
+    public static void main2(String[] args) throws Exception {
         Socket client = new Socket();
 
         SocketAddress address = new InetSocketAddress(InetAddress.getByName("127.0.0.1"),20000);
@@ -22,6 +24,14 @@ public class SocketClient {
         while (true) {
             client.getInputStream().read(b);
             System.err.println("+"+ Arrays.toString(b));
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            SocketClient.class.getClassLoader().loadClass("com.lyw.hadoop.design.singleton.SingletonEnum");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -17,11 +17,11 @@ public class Lhadoop {
     private static Logger logger = LoggerFactory.getLogger(Lhadoop.class);
 
     static Integer Int = 0;
-    public static void main2(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         // 创建Configuration对象
 
         Configuration conf=new Configuration();
-        String arg="hdfs://localhost:9000/user/wangxiaowu/out/part-r-00000";
+        String arg="hdfs://bigdata111:9000/input/a.txt";
         // 创建FileSystem对象
         FileSystem fs=
                 FileSystem.get(URI.create(arg),conf);
@@ -56,7 +56,7 @@ public class Lhadoop {
 
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main2(String[] args) throws InterruptedException {
         Lhadoop l = new Lhadoop();
         l.threadPool();
         Thread.sleep(1000);
