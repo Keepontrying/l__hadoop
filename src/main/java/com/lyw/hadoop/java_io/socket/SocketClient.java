@@ -4,6 +4,8 @@ import com.lyw.hadoop.design.singleton.SingletonEnum;
 
 import java.net.*;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 类描述：
@@ -33,5 +35,7 @@ public class SocketClient {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        Map map = new HashMap(9);
+        map.put("tst", "sff");
     }
 }
