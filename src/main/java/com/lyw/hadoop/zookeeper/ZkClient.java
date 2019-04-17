@@ -5,6 +5,9 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.ZooKeeper;
+
+import java.io.IOException;
 
 public class ZkClient {
     private static Integer NUMBER=10;
@@ -50,6 +53,13 @@ public class ZkClient {
                     }
                 }
             }).start();
+        }
+
+
+        try {
+            ZooKeeper zooKeeper = new ZooKeeper("", 5000, null);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

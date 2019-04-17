@@ -1,5 +1,7 @@
 package com.lyw.hadoop.arithmetic;
 
+import java.util.Arrays;
+
 /**
  * 类描述：字符串匹配算法
  *
@@ -53,6 +55,7 @@ public class KMPArithmetic {
         int next = 0;
         int j = 0;
         int index = 0;
+        int[] next_arr = next(match_str);
 
         lookup :
         for (int i = 0; i <s_bytes.length ; i++) {
@@ -64,7 +67,7 @@ public class KMPArithmetic {
                     continue lookup;
                 }
                 //不相等，决定主串移动位置
-                next = next(match_str);
+                next = next_arr[j];
                 j = j - next;
             }
             if (j == t_bytes.length) {
@@ -80,9 +83,25 @@ public class KMPArithmetic {
      * @param match_str
      * @return
      */
-    private int next(StringBuilder match_str) {
-
-        return 0;
+    public int[] next(StringBuilder match_str) {
+        int[] next = new int[match_str.length()];
+        byte[] n_byte = match_str.toString().getBytes();
+        next[0] = -1;//循环查找
+        next[1] = 0;
+        int k = 0;
+        for (int i = 2; i < n_byte.length; i++) {
+            k = next[i-1];//获取前一个子字符串的最大匹配长度
+            while (k != -1) {
+                if (n_byte[i-1] == n_byte[k]) {//位置向右移动一位
+                    next[i] = k + 1;
+                    break;
+                }else {
+                    k = next[k];//查找子字串的匹配长度，和子串的末尾比较
+                }
+                next[i] = 0;
+            }
+        }
+        return next;
     }
 
     public int searchIndexOf(String text, String pattern) {
@@ -112,9 +131,11 @@ public class KMPArithmetic {
 
     public static void main(String[] args) {
         KMPArithmetic k = new KMPArithmetic();
-        char[] chars = "eafdadfasdfsaefasfesabcd".toCharArray();
-        int i =  k.indexOf("eafdadfasdfsaefasfesssssssssssabcd");
-        System.err.println("index="+i);
+        char[] chars = "eafdae".toCharArray();
+//        int i =  k.indexOf("eafdadfasdfsaefasfesssssssssssabcd");
+//        System.err.println("index="+i);
+        int[] c = k.next(new StringBuilder("abcabcab"));
+        System.err.println(Arrays.toString(c));
     }
 
 }
